@@ -12,6 +12,8 @@ import PDV from "./pages/PDV";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
 import Pets from "./pages/Pets";
+import Appointments from "./pages/Appointments";
+import Services from "./pages/Services";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/customers" element={<Customers />} />
           <Route path="/products" element={<Products />} />
           <Route path="/pets" element={<Pets />} />
+          <Route path="/appointments" element={<Appointments />} />
+          <Route path="/services" element={<Services />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

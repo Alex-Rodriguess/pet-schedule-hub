@@ -179,11 +179,20 @@ export default function PDV() {
     try {
       const total = calculateTotal();
       
+      if (!petshop?.id) {
+        toast({
+          title: "Erro",
+          description: "Petshop não encontrado. Verifique seu perfil.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Criar a venda
       const { data: sale, error: saleError } = await supabase
         .from('sales')
         .insert({
-          petshop_id: petshop?.id || '',
+          petshop_id: petshop.id,
           customer_id: selectedCustomer || null,
           total_amount: saleItems.reduce((sum, item) => sum + item.total_price, 0),
           discount_amount: discount,

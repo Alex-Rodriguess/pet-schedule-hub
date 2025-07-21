@@ -90,9 +90,18 @@ export default function Customers() {
           description: "As informações foram salvas com sucesso",
         });
       } else {
+        if (!petshop?.id) {
+          toast({
+            title: "Erro",
+            description: "Petshop não encontrado. Verifique seu perfil.",
+            variant: "destructive",
+          });
+          return;
+        }
+
         const { error } = await supabase
           .from('customers')
-          .insert([{ ...formData, petshop_id: petshop?.id || '' }]);
+          .insert([{ ...formData, petshop_id: petshop.id }]);
 
         if (error) throw error;
 

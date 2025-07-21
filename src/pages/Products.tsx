@@ -88,8 +88,17 @@ export default function Products() {
     setIsLoading(true);
 
     try {
+      if (!petshop?.id) {
+        toast({
+          title: "Erro",
+          description: "Petshop não encontrado. Verifique seu perfil.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const productData = {
-        petshop_id: petshop?.id || '',
+        petshop_id: petshop.id,
         name: formData.name,
         description: formData.description || null,
         barcode: formData.barcode || null,

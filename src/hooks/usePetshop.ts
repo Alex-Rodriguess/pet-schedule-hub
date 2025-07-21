@@ -26,20 +26,29 @@ export function usePetshop() {
 
   const loadPetshop = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
       const { data: profile } = await supabase
         .from('profiles')
         .select('id')
-        .eq('user_id', (await supabase.auth.getUser()).data.user?.id)
-        .single();
+        .eq('user_id', user.id)
+        .maybeSingle();
 
       if (profile) {
         const { data: petshopData } = await supabase
           .from('petshops')
           .select('*')
           .eq('owner_id', profile.id)
-          .single();
+          .maybeSingle();
 
-        setPetshop(petshopData);
+        if (petshopData) {
+          setPetshop(petshopData);
+        }
       }
     } catch (error) {
       console.error('Erro ao carregar petshop:', error);
