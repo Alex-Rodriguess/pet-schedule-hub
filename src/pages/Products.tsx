@@ -11,6 +11,7 @@ import { Plus, Search, Edit, Trash2, Package, BarChart, AlertTriangle, DollarSig
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePetshop } from '@/hooks/usePetshop';
+import Layout from '@/components/Layout';
 
 interface Product {
   id: string;
@@ -241,7 +242,8 @@ export default function Products() {
   const totalCost = products.reduce((sum, p) => sum + (p.stock_quantity * (p.cost || 0)), 0);
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Package className="h-8 w-8 text-primary" />
@@ -536,6 +538,7 @@ export default function Products() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </Layout>
   );
 }

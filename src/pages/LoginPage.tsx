@@ -6,31 +6,32 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PawPrint, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { toast } = useToast();
+  const { signIn } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: ''
+  });
 
   const handleLogin = async (e: React.FormEvent, userType: 'petshop' | 'customer') => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simular login
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Login realizado com sucesso!",
-        description: `Bem-vindo(a) ao sistema.`,
-      });
-      
+    const { success } = await signIn(formData.email, formData.password);
+    
+    if (success) {
       if (userType === 'petshop') {
         navigate('/dashboard');
       } else {
         navigate('/client-portal');
       }
-    }, 1500);
+    }
+    
+    setIsLoading(false);
   };
 
   return (
@@ -106,6 +107,8 @@ export default function LoginPage() {
                           type="email"
                           placeholder="seu@petshop.com"
                           className="pl-10"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                           required
                         />
                       </div>
@@ -120,6 +123,8 @@ export default function LoginPage() {
                           type="password"
                           placeholder="Sua senha"
                           className="pl-10"
+                          value={formData.password}
+                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                           required
                         />
                       </div>

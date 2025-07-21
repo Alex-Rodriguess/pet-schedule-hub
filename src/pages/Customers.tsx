@@ -11,6 +11,7 @@ import { Plus, Search, Edit, Trash2, Users, Phone, Mail } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePetshop } from '@/hooks/usePetshop';
+import Layout from '@/components/Layout';
 
 interface Customer {
   id: string;
@@ -175,7 +176,8 @@ export default function Customers() {
   );
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Users className="h-8 w-8 text-primary" />
@@ -389,6 +391,7 @@ export default function Customers() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </Layout>
   );
 }

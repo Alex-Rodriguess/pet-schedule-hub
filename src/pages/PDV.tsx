@@ -9,6 +9,7 @@ import { Trash2, Plus, ShoppingCart, CreditCard, Banknote, Smartphone, BarChart3
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePetshop } from '@/hooks/usePetshop';
+import Layout from '@/components/Layout';
 
 interface Product {
   id: string;
@@ -332,7 +333,8 @@ export default function PDV() {
   );
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-primary">PDV - Ponto de Venda</h1>
         <Badge variant="secondary" className="text-lg px-4 py-2">
@@ -553,6 +555,7 @@ export default function PDV() {
           </Card>
         </div>
       </div>
-    </div>
+      </div>
+    </Layout>
   );
 }

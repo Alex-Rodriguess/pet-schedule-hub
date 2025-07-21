@@ -12,6 +12,7 @@ import { Plus, Search, Edit, Trash2, Heart, Calendar, Scale, Ruler } from 'lucid
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { usePetshop } from '@/hooks/usePetshop';
+import Layout from '@/components/Layout';
 
 interface Pet {
   id: string;
@@ -251,7 +252,8 @@ export default function Pets() {
   const averageAge = pets.length > 0 ? (pets.reduce((sum, p) => sum + p.age, 0) / pets.length).toFixed(1) : '0';
 
   return (
-    <div className="container mx-auto p-4 space-y-6">
+    <Layout>
+      <div className="container mx-auto p-4 space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <Heart className="h-8 w-8 text-primary" />
@@ -507,6 +509,7 @@ export default function Pets() {
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </Layout>
   );
 }

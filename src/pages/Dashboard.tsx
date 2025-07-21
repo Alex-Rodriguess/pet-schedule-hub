@@ -19,9 +19,12 @@ import {
 import { mockDashboardStats, mockAppointments, mockPets } from '@/data/mockData';
 import { format, addDays } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import Layout from '@/components/Layout';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const navigate = useNavigate();
   const stats = mockDashboardStats;
 
   // Simular agenda para os próximos dias
@@ -53,8 +56,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <Layout>
+      <div className="p-6">
+        <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
           <div>
@@ -279,7 +283,12 @@ export default function Dashboard() {
                   <Plus className="h-4 w-4 mr-2" />
                   Novo Agendamento
                 </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => navigate('/pets')}
+                >
                   <PawPrint className="h-4 w-4 mr-2" />
                   Cadastrar Pet
                 </Button>
@@ -287,7 +296,12 @@ export default function Dashboard() {
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Ver Relatórios
                 </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full justify-start"
+                  onClick={() => navigate('/customers')}
+                >
                   <Users className="h-4 w-4 mr-2" />
                   Gerenciar Clientes
                 </Button>
@@ -295,7 +309,8 @@ export default function Dashboard() {
             </Card>
           </div>
         </div>
+        </div>
       </div>
-    </div>
+    </Layout>
   );
 }
