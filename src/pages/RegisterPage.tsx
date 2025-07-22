@@ -66,7 +66,7 @@ export default function RegisterPage() {
         options: {
           data: {
             name: formData.ownerName,
-            role: 'owner'
+            role: 'petshop_owner'
           },
           emailRedirectTo: `${window.location.origin}/dashboard`
         }
