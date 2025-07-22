@@ -12,8 +12,11 @@ import {
   Bell,
   Menu,
   X,
-  Calendar
+  Calendar,
+  Moon,
+  Sun
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 import { usePetshop } from '@/hooks/usePetshop';
@@ -29,6 +32,7 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { petshop, loading } = usePetshop();
   const { signOut } = useAuth();
+  const { theme, setTheme } = useTheme();
 
   const menuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
@@ -137,6 +141,13 @@ export default function Layout({ children }: LayoutProps) {
             </Button>
 
             <div className="flex items-center space-x-3 ml-auto">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
               <Button variant="ghost" size="sm">
                 <Bell className="h-4 w-4" />
                 <Badge className="ml-1 bg-destructive text-destructive-foreground">3</Badge>
