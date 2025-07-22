@@ -9,6 +9,7 @@ import { PawPrint, ArrowLeft, Store, Mail, Lock, Phone, MapPin } from 'lucide-re
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useToast } from '@/hooks/use-toast';
 import { saasPlans } from '@/data/mockData';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -17,6 +18,15 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [selectedPlan, setSelectedPlan] = useState(searchParams.get('plan') || 'free');
+  const [formData, setFormData] = useState({
+    businessName: '',
+    ownerName: '',
+    email: '',
+    phone: '',
+    address: '',
+    password: '',
+    confirmPassword: ''
+  });
 
   const handlePlanSelect = (planId: string) => {
     setSelectedPlan(planId);
@@ -27,15 +37,125 @@ export default function RegisterPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simular registro
-    setTimeout(() => {
-      setIsLoading(false);
-      toast({
-        title: "Cadastro realizado com sucesso!",
-        description: "Bem-vindo ao Pet Schedule Hub! Sua conta foi criada.",
+    try {
+      // Validar senhas
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Erro",
+          description: "As senhas não coincidem.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (formData.password.length < 6) {
+        toast({
+          title: "Erro", 
+          description: "A senha deve ter pelo menos 6 caracteres.",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      // Criar usuário no Supabase
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.ownerName,
+            role: 'owner'
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`
+        }
       });
-      navigate('/dashboard');
-    }, 2000);
+
+      if (authError) {
+        console.error('Erro de autenticação:', authError);
+        toast({
+          title: "Erro no cadastro",
+          description: authError.message,
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (authData.user) {
+        // Aguardar criação do perfil pelo trigger
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // Buscar o perfil criado
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('user_id', authData.user.id)
+          .single();
+
+        if (profileError || !profile) {
+          console.error('Erro ao buscar perfil:', profileError);
+          toast({
+            title: "Erro",
+            description: "Erro ao criar perfil do usuário.",
+            variant: "destructive"
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        // Criar petshop
+        const { data: petshopData, error: petshopError } = await supabase
+          .from('petshops')
+          .insert({
+            name: formData.businessName,
+            email: formData.email,
+            phone: formData.phone,
+            address: formData.address,
+            owner_id: profile.id,
+            plan: selectedPlan,
+            primary_color: '#3B82F6',
+            secondary_color: '#10B981'
+          })
+          .select()
+          .single();
+
+        if (petshopError) {
+          console.error('Erro ao criar petshop:', petshopError);
+          toast({
+            title: "Erro",
+            description: "Erro ao criar petshop: " + petshopError.message,
+            variant: "destructive"
+          });
+          setIsLoading(false);
+          return;
+        }
+
+        toast({
+          title: "Cadastro realizado com sucesso!",
+          description: "Bem-vindo ao Pet Schedule Hub! Sua conta foi criada.",
+        });
+        
+        navigate('/dashboard');
+      }
+    } catch (error) {
+      console.error('Erro geral:', error);
+      toast({
+        title: "Erro",
+        description: "Erro inesperado durante o cadastro.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   if (step === 1) {
@@ -154,6 +274,8 @@ export default function RegisterPage() {
                       type="text"
                       placeholder="Pet Care Center"
                       className="pl-10"
+                      value={formData.businessName}
+                      onChange={(e) => handleInputChange('businessName', e.target.value)}
                       required
                     />
                   </div>
@@ -165,6 +287,8 @@ export default function RegisterPage() {
                     id="owner-name"
                     type="text"
                     placeholder="Seu nome completo"
+                    value={formData.ownerName}
+                    onChange={(e) => handleInputChange('ownerName', e.target.value)}
                     required
                   />
                 </div>
@@ -178,6 +302,8 @@ export default function RegisterPage() {
                       type="email"
                       placeholder="contato@petshop.com"
                       className="pl-10"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
                       required
                     />
                   </div>
@@ -192,6 +318,8 @@ export default function RegisterPage() {
                       type="tel"
                       placeholder="(11) 99999-9999"
                       className="pl-10"
+                      value={formData.phone}
+                      onChange={(e) => handleInputChange('phone', e.target.value)}
                       required
                     />
                   </div>
@@ -206,6 +334,8 @@ export default function RegisterPage() {
                       type="text"
                       placeholder="Rua das Flores, 123 - São Paulo, SP"
                       className="pl-10"
+                      value={formData.address}
+                      onChange={(e) => handleInputChange('address', e.target.value)}
                       required
                     />
                   </div>
@@ -218,8 +348,10 @@ export default function RegisterPage() {
                     <Input
                       id="password"
                       type="password"
-                      placeholder="Mínimo 8 caracteres"
+                      placeholder="Mínimo 6 caracteres"
                       className="pl-10"
+                      value={formData.password}
+                      onChange={(e) => handleInputChange('password', e.target.value)}
                       required
                     />
                   </div>
@@ -234,6 +366,8 @@ export default function RegisterPage() {
                       type="password"
                       placeholder="Confirme sua senha"
                       className="pl-10"
+                      value={formData.confirmPassword}
+                      onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                       required
                     />
                   </div>

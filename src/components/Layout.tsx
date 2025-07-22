@@ -11,10 +11,13 @@ import {
   LogOut,
   Bell,
   Menu,
-  X
+  X,
+  Calendar
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
+import { usePetshop } from '@/hooks/usePetshop';
+import { useAuth } from '@/hooks/useAuth';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -24,18 +27,23 @@ export default function Layout({ children }: LayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const { petshop, loading } = usePetshop();
+  const { signOut } = useAuth();
 
   const menuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
     { path: '/customers', label: 'Clientes', icon: Users },
     { path: '/pets', label: 'Pets', icon: PawPrint },
     { path: '/products', label: 'Produtos', icon: Package },
+    { path: '/services', label: 'Serviços', icon: Settings },
+    { path: '/appointments', label: 'Agendamentos', icon: Calendar },
     { path: '/pdv', label: 'PDV', icon: ShoppingCart },
   ];
 
   const isActive = (path: string) => location.pathname === path;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     navigate('/');
   };
 
@@ -135,9 +143,13 @@ export default function Layout({ children }: LayoutProps) {
               </Button>
               <div className="flex items-center space-x-2">
                 <div className="w-8 h-8 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <span className="text-sm font-medium text-white">PS</span>
+                  <span className="text-sm font-medium text-white">
+                    {petshop?.name?.substring(0, 2).toUpperCase() || 'PS'}
+                  </span>
                 </div>
-                <span className="text-sm font-medium">Pet Shop Demo</span>
+                <span className="text-sm font-medium">
+                  {loading ? 'Carregando...' : (petshop?.name || 'Pet Shop')}
+                </span>
               </div>
             </div>
           </div>
