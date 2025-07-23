@@ -74,13 +74,29 @@ export default function Dashboard() {
               Notificações
               <Badge className="ml-2 bg-destructive">3</Badge>
             </Button>
-            <Button variant="outline" size="sm">
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => navigate('/settings')}
+            >
               <Settings className="h-4 w-4 mr-2" />
               Configurações
             </Button>
-            <Button size="sm" className="bg-gradient-primary">
+            <Button 
+              size="sm" 
+              className="bg-gradient-primary"
+              onClick={() => navigate('/appointments')}
+            >
               <Plus className="h-4 w-4 mr-2" />
               Novo Agendamento
+            </Button>
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.open('https://www.youtube.com.br', '_blank')}
+              className="hover:bg-primary hover:text-primary-foreground"
+            >
+              Ver Demonstração
             </Button>
           </div>
         </div>
