@@ -21,6 +21,7 @@ interface Pet {
   age: number;
   size: 'small' | 'medium' | 'large';
   weight: number;
+  coat_type?: string;
   photo_url?: string;
   notes?: string;
   created_at: string;
@@ -49,6 +50,8 @@ export default function Pets() {
     age: '',
     size: 'medium' as 'small' | 'medium' | 'large',
     weight: '',
+    coat_type: '',
+    photo_url: '',
     notes: '',
     customer_id: ''
   });
@@ -118,6 +121,8 @@ export default function Pets() {
         age: parseInt(formData.age) || 0,
         size: formData.size,
         weight: parseFloat(formData.weight) || 0,
+        coat_type: formData.coat_type || null,
+        photo_url: formData.photo_url || null,
         notes: formData.notes || null,
         customer_id: formData.customer_id
       };
@@ -171,6 +176,8 @@ export default function Pets() {
       age: pet.age.toString(),
       size: pet.size,
       weight: pet.weight.toString(),
+      coat_type: pet.coat_type || '',
+      photo_url: pet.photo_url || '',
       notes: pet.notes || '',
       customer_id: pet.customer.id
     });
@@ -213,6 +220,8 @@ export default function Pets() {
       age: '',
       size: 'medium',
       weight: '',
+      coat_type: '',
+      photo_url: '',
       notes: '',
       customer_id: ''
     });
@@ -349,6 +358,31 @@ export default function Pets() {
                     </SelectContent>
                   </Select>
                 </div>
+                <div>
+                  <Label htmlFor="coat_type">Tipo de Pelagem</Label>
+                  <Select value={formData.coat_type} onValueChange={(value) => setFormData(prev => ({ ...prev, coat_type: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecionar tipo" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="curto">Curto</SelectItem>
+                      <SelectItem value="longo">Longo</SelectItem>
+                      <SelectItem value="ondulado">Ondulado</SelectItem>
+                      <SelectItem value="crespo">Crespo</SelectItem>
+                      <SelectItem value="liso">Liso</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="photo_url">URL da Foto</Label>
+                  <Input
+                    id="photo_url"
+                    type="url"
+                    value={formData.photo_url}
+                    onChange={(e) => setFormData(prev => ({ ...prev, photo_url: e.target.value }))}
+                    placeholder="https://exemplo.com/foto.jpg"
+                  />
+                </div>
                 <div className="col-span-2">
                   <Label htmlFor="notes">Observações</Label>
                   <Textarea
@@ -453,6 +487,7 @@ export default function Pets() {
               <TableRow>
                 <TableHead>Pet</TableHead>
                 <TableHead>Raça</TableHead>
+                <TableHead>Pelagem</TableHead>
                 <TableHead>Idade</TableHead>
                 <TableHead>Porte</TableHead>
                 <TableHead>Peso</TableHead>
@@ -463,8 +498,20 @@ export default function Pets() {
             <TableBody>
               {filteredPets.map((pet) => (
                 <TableRow key={pet.id}>
-                  <TableCell className="font-medium">{pet.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <div className="flex items-center gap-3">
+                      {pet.photo_url && (
+                        <img 
+                          src={pet.photo_url} 
+                          alt={pet.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                      )}
+                      <span>{pet.name}</span>
+                    </div>
+                  </TableCell>
                   <TableCell>{pet.breed}</TableCell>
+                  <TableCell>{pet.coat_type || '-'}</TableCell>
                   <TableCell>{pet.age} {pet.age === 1 ? 'ano' : 'anos'}</TableCell>
                   <TableCell>
                     <Badge variant={getSizeBadgeVariant(pet.size) as any}>

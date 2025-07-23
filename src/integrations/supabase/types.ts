@@ -139,6 +139,7 @@ export type Database = {
         Row: {
           age: number
           breed: string
+          coat_type: string | null
           created_at: string
           customer_id: string
           id: string
@@ -152,6 +153,7 @@ export type Database = {
         Insert: {
           age: number
           breed: string
+          coat_type?: string | null
           created_at?: string
           customer_id: string
           id?: string
@@ -165,6 +167,7 @@ export type Database = {
         Update: {
           age?: number
           breed?: string
+          coat_type?: string | null
           created_at?: string
           customer_id?: string
           id?: string
