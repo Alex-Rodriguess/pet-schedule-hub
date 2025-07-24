@@ -26,9 +26,9 @@ export default function LoginPage() {
     
     if (success) {
       if (userType === 'petshop') {
-        navigate('/dashboard');
+        navigate('/petshop/dashboard');
       } else {
-        navigate('/client-portal');
+        navigate('/client/appointments');
       }
     }
     
@@ -243,7 +243,7 @@ export default function LoginPage() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => navigate('/dashboard')}
+                    onClick={() => navigate('/petshop/dashboard')}
                     className="flex-1"
                   >
                     Demo Petshop
@@ -251,7 +251,7 @@ export default function LoginPage() {
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    onClick={() => navigate('/client-portal')}
+                    onClick={() => navigate('/client/appointments')}
                     className="flex-1"
                   >
                     Demo Cliente
