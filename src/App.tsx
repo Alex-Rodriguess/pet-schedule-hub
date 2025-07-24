@@ -10,6 +10,7 @@ import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
 import ClientPortal from "./pages/ClientPortal";
 import CustomerRegister from "./pages/CustomerRegister";
+import CustomerRegisterPage from "./pages/CustomerRegisterPage";
 import PDV from "./pages/PDV";
 import Customers from "./pages/Customers";
 import Products from "./pages/Products";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/customer-register" element={<CustomerRegister />} />
+            <Route path="/customer-register-standalone" element={<CustomerRegisterPage />} />
             <Route path="/client-portal" element={<ClientPortal />} />
             <Route path="/pdv" element={<PDV />} />
             <Route path="/products" element={<Products />} />

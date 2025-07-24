@@ -6,11 +6,11 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { PawPrint, Mail, Lock, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuthWithRole } from '@/hooks/useAuthWithRole';
 
 export default function LoginPage() {
   const navigate = useNavigate();
-  const { signIn } = useAuth();
+  const { signIn } = useAuthWithRole();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
@@ -21,7 +21,8 @@ export default function LoginPage() {
     e.preventDefault();
     setIsLoading(true);
 
-    const { success } = await signIn(formData.email, formData.password);
+    const expectedRole = userType === 'petshop' ? 'petshop_owner' : 'customer';
+    const { success } = await signIn(formData.email, formData.password, expectedRole);
     
     if (success) {
       if (userType === 'petshop') {
@@ -168,7 +169,7 @@ export default function LoginPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <form onSubmit={(e) => handleLogin(e, 'customer')} className="space-y-4">
+                      <form onSubmit={(e) => handleLogin(e, 'customer')} className="space-y-4">
                     <div className="space-y-2">
                       <Label htmlFor="customer-email">Email</Label>
                       <div className="relative">
@@ -178,6 +179,8 @@ export default function LoginPage() {
                           type="email"
                           placeholder="seu@email.com"
                           className="pl-10"
+                          value={formData.email}
+                          onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
                           required
                         />
                       </div>
@@ -192,6 +195,8 @@ export default function LoginPage() {
                           type="password"
                           placeholder="Sua senha"
                           className="pl-10"
+                          value={formData.password}
+                          onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
                           required
                         />
                       </div>
@@ -215,7 +220,7 @@ export default function LoginPage() {
                       <Button 
                         variant="link" 
                         className="p-0 h-auto"
-                        onClick={() => navigate('/customer-register')}
+                        onClick={() => navigate('/customer-register-standalone')}
                       >
                         Criar conta
                       </Button>
