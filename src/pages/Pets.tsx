@@ -55,6 +55,7 @@ export default function Pets() {
     notes: '',
     customer_id: ''
   });
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const { petshop } = usePetshop();
@@ -115,6 +116,27 @@ export default function Pets() {
     setIsLoading(true);
 
     try {
+      let photoUrl = formData.photo_url;
+      
+      // Upload da foto se houver arquivo
+      if (photoFile) {
+        const fileExt = photoFile.name.split('.').pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('pet-photos')
+          .upload(filePath, photoFile);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('pet-photos')
+          .getPublicUrl(filePath);
+
+        photoUrl = publicUrl;
+      }
+
       const petData = {
         name: formData.name,
         breed: formData.breed,
@@ -122,7 +144,7 @@ export default function Pets() {
         size: formData.size,
         weight: parseFloat(formData.weight) || 0,
         coat_type: formData.coat_type || null,
-        photo_url: formData.photo_url || null,
+        photo_url: photoUrl || null,
         notes: formData.notes || null,
         customer_id: formData.customer_id
       };
@@ -154,6 +176,7 @@ export default function Pets() {
 
       setIsDialogOpen(false);
       setEditingPet(null);
+      setPhotoFile(null);
       resetForm();
       loadPets();
     } catch (error) {
@@ -225,6 +248,7 @@ export default function Pets() {
       notes: '',
       customer_id: ''
     });
+    setPhotoFile(null);
   };
 
   const getSizeLabel = (size: string) => {
@@ -374,14 +398,26 @@ export default function Pets() {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="photo_url">URL da Foto</Label>
-                  <Input
-                    id="photo_url"
-                    type="url"
-                    value={formData.photo_url}
-                    onChange={(e) => setFormData(prev => ({ ...prev, photo_url: e.target.value }))}
-                    placeholder="https://exemplo.com/foto.jpg"
-                  />
+                  <Label htmlFor="photo">Foto do Pet</Label>
+                  <div className="space-y-2">
+                    <Input
+                      id="photo"
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setPhotoFile(file);
+                        }
+                      }}
+                    />
+                    <Input
+                      type="url"
+                      value={formData.photo_url}
+                      onChange={(e) => setFormData(prev => ({ ...prev, photo_url: e.target.value }))}
+                      placeholder="Ou cole uma URL da foto"
+                    />
+                  </div>
                 </div>
                 <div className="col-span-2">
                   <Label htmlFor="notes">Observações</Label>
