@@ -182,8 +182,14 @@ export default function Appointments() {
 
       // Calcular end_time baseado na duração do serviço
       const startTime = new Date(`1970-01-01T${formData.start_time}:00`);
-      const endTime = new Date(startTime.getTime() + service.duration * 60000);
-      const endTimeString = endTime.toTimeString().slice(0, 5);
+      let endTimeString = formData.start_time; // fallback para start_time
+      
+      if (service.duration && !isNaN(service.duration)) {
+        const endTime = new Date(startTime.getTime() + service.duration * 60000);
+        if (!isNaN(endTime.getTime())) {
+          endTimeString = endTime.toTimeString().slice(0, 5);
+        }
+      }
 
       const appointmentData = {
         ...formData,
