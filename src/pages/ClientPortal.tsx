@@ -185,7 +185,7 @@ export default function ClientPortal() {
         name: '',
         breed: '',
         age: '',
-        size: '',
+        size: 'medium',
         weight: '',
         notes: ''
       });
