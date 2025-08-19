@@ -287,10 +287,10 @@ export default function Pets() {
   return (
     <Layout>
       <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <Heart className="h-8 w-8 text-primary" />
-          <h1 className="text-3xl font-bold text-primary">Pets</h1>
+          <Heart className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+          <h1 className="text-2xl sm:text-3xl font-bold text-primary">Pets</h1>
         </div>
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
@@ -302,7 +302,7 @@ export default function Pets() {
               Novo Pet
             </Button>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[500px]">
+          <DialogContent className="sm:max-w-[500px] mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingPet ? 'Editar Pet' : 'Novo Pet'}
@@ -346,12 +346,12 @@ export default function Pets() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="age">Idade (anos)</Label>
+                  <Label htmlFor="age">Idade (meses)</Label>
                   <Input
                     id="age"
                     type="number"
                     min="0"
-                    max="30"
+                    max="360"
                     value={formData.age}
                     onChange={(e) => setFormData(prev => ({ ...prev, age: e.target.value }))}
                     placeholder="0"
@@ -447,7 +447,7 @@ export default function Pets() {
         </Dialog>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
@@ -482,7 +482,7 @@ export default function Pets() {
               </div>
               <div>
                 <p className="text-2xl font-bold">{averageAge}</p>
-                <p className="text-sm text-muted-foreground">Idade Média</p>
+                <p className="text-sm text-muted-foreground">Idade Média (meses)</p>
               </div>
             </div>
           </CardContent>

@@ -46,7 +46,7 @@ export default function ClientPortal() {
     name: '',
     breed: '',
     age: '',
-    size: '',
+    size: 'medium',
     weight: '',
     notes: ''
   });
@@ -136,7 +136,7 @@ export default function ClientPortal() {
 
   const handleSavePet = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user) return;
+    if (!user || !petshop?.id) return;
 
     try {
       // First, get or create customer
@@ -144,6 +144,7 @@ export default function ClientPortal() {
         .from('customers')
         .select('*')
         .eq('email', user.email)
+        .eq('petshop_id', petshop.id)
         .single();
 
       if (customerError && customerError.code !== 'PGRST116') {
@@ -157,7 +158,7 @@ export default function ClientPortal() {
             name: user.email,
             email: user.email,
             phone: '',
-            petshop_id: petshop?.id || ''
+            petshop_id: petshop.id
           })
           .select()
           .single();
@@ -169,9 +170,12 @@ export default function ClientPortal() {
       const { error } = await supabase
         .from('pets')
         .insert({
-          ...petForm,
-          age: parseInt(petForm.age),
+          name: petForm.name,
+          breed: petForm.breed,
+          age: parseInt(petForm.age) || 0,
+          size: petForm.size,
           weight: petForm.weight ? parseFloat(petForm.weight) : null,
+          notes: petForm.notes || null,
           customer_id: customer.id
         });
 
@@ -181,7 +185,7 @@ export default function ClientPortal() {
         name: '',
         breed: '',
         age: '',
-        size: '',
+        size: 'medium',
         weight: '',
         notes: ''
       });
@@ -285,59 +289,59 @@ export default function ClientPortal() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="bg-gradient-primary text-primary-foreground p-6">
-        <div className="max-w-4xl mx-auto">
+      <header className="bg-gradient-primary text-primary-foreground p-4 sm:p-6">
+        <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold flex items-center space-x-3">
-                <PawPrint className="h-8 w-8" />
+              <h1 className="text-2xl sm:text-3xl font-bold flex items-center space-x-3">
+                <PawPrint className="h-6 w-6 sm:h-8 sm:w-8" />
                 <span>{petshop?.name || 'Pet Shop'}</span>
               </h1>
-              <p className="opacity-90 mt-2">
+              <p className="opacity-90 mt-2 text-sm sm:text-base">
                 Portal do Cliente - Gerencie os agendamentos dos seus pets
               </p>
             </div>
             
             <div className="flex items-center space-x-3">
-              <div className="text-right text-sm">
+              <div className="text-right text-sm hidden sm:block">
                 <div className="font-semibold">{user?.email || 'Cliente'}</div>
                 <div className="opacity-80">{user?.email}</div>
               </div>
               <Button variant="secondary" size="sm">
                 <User className="h-4 w-4 mr-2" />
-                Perfil
+                <span className="hidden sm:inline">Perfil</span>
               </Button>
             </div>
           </div>
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6 sm:space-y-8">
         {/* Navigation Tabs */}
-        <div className="flex space-x-1 bg-muted p-1 rounded-lg">
+        <div className="flex space-x-1 bg-muted p-1 rounded-lg overflow-x-auto">
           <Button
             variant={activeTab === 'appointments' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('appointments')}
-            className="flex-1"
+            className="flex-1 min-w-fit"
           >
-            <Calendar className="h-4 w-4 mr-2" />
-            Agendamentos
+            <Calendar className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Agendamentos</span>
           </Button>
           <Button
             variant={activeTab === 'pets' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('pets')}
-            className="flex-1"
+            className="flex-1 min-w-fit"
           >
-            <PawPrint className="h-4 w-4 mr-2" />
-            Meus Pets
+            <PawPrint className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Meus Pets</span>
           </Button>
           <Button
             variant={activeTab === 'schedule' ? 'default' : 'ghost'}
             onClick={() => setActiveTab('schedule')}
-            className="flex-1"
+            className="flex-1 min-w-fit"
           >
-            <Plus className="h-4 w-4 mr-2" />
-            Agendar
+            <Plus className="h-4 w-4 mr-1 sm:mr-2" />
+            <span className="text-xs sm:text-sm">Agendar</span>
           </Button>
         </div>
 
@@ -358,7 +362,7 @@ export default function ClientPortal() {
                       Novo Agendamento
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md">
+                  <DialogContent className="max-w-md mx-4 sm:mx-auto">
                     <DialogHeader>
                       <DialogTitle>Novo Agendamento</DialogTitle>
                       <DialogDescription>
@@ -514,7 +518,7 @@ export default function ClientPortal() {
                       Cadastrar Pet
                     </Button>
                   </DialogTrigger>
-                  <DialogContent>
+                  <DialogContent className="max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
                     <DialogHeader>
                       <DialogTitle>Cadastrar Novo Pet</DialogTitle>
                       <DialogDescription>
@@ -522,34 +526,39 @@ export default function ClientPortal() {
                       </DialogDescription>
                     </DialogHeader>
                     <form onSubmit={handleSavePet} className="space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                          <Label htmlFor="name">Nome</Label>
+                          <Label htmlFor="name">Nome *</Label>
                           <Input
                             id="name"
                             value={petForm.name}
                             onChange={(e) => setPetForm(prev => ({ ...prev, name: e.target.value }))}
+                            placeholder="Nome do pet"
                             required
                           />
                         </div>
                         <div>
-                          <Label htmlFor="breed">Raça</Label>
+                          <Label htmlFor="breed">Raça *</Label>
                           <Input
                             id="breed"
                             value={petForm.breed}
                             onChange={(e) => setPetForm(prev => ({ ...prev, breed: e.target.value }))}
+                            placeholder="Raça do pet"
                             required
                           />
                         </div>
                       </div>
-                      <div className="grid grid-cols-3 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div>
-                          <Label htmlFor="age">Idade</Label>
+                           <Label htmlFor="age">Idade (meses)</Label>
                           <Input
                             id="age"
                             type="number"
+                            min="0"
+                            max="360"
                             value={petForm.age}
                             onChange={(e) => setPetForm(prev => ({ ...prev, age: e.target.value }))}
+                            placeholder="0"
                             required
                           />
                         </div>
@@ -599,16 +608,16 @@ export default function ClientPortal() {
                 </Dialog>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {pets.map((pet) => (
                 <Card key={pet.id} className="shadow-soft">
                   <CardContent className="p-6">
-                    <div className="flex items-start space-x-4">
-                      <div className="w-20 h-20 bg-gradient-primary rounded-full flex items-center justify-center">
-                        <PawPrint className="h-10 w-10 text-white" />
+                    <div className="flex flex-col sm:flex-row items-start space-y-4 sm:space-y-0 sm:space-x-4">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-primary rounded-full flex items-center justify-center mx-auto sm:mx-0">
+                        <PawPrint className="h-8 w-8 sm:h-10 sm:w-10 text-white" />
                       </div>
                       
-                      <div className="flex-1 space-y-2">
+                      <div className="flex-1 space-y-2 text-center sm:text-left">
                         <div className="flex items-center justify-between">
                           <h3 className="text-xl font-semibold">{pet.name}</h3>
                           <Button variant="outline" size="sm">
@@ -616,12 +625,12 @@ export default function ClientPortal() {
                           </Button>
                         </div>
                         
-                        <div className="space-y-1 text-sm text-muted-foreground">
-                          <div>Raça: {pet.breed}</div>
-                          <div>Idade: {pet.age} anos</div>
-                          <div>Porte: {pet.size === 'small' ? 'Pequeno' : pet.size === 'medium' ? 'Médio' : 'Grande'}</div>
-                          <div>Peso: {pet.weight}kg</div>
-                        </div>
+                          <div className="space-y-1 text-sm text-muted-foreground">
+                            <div>Raça: {pet.breed}</div>
+                            <div>Idade: {pet.age} meses</div>
+                            <div>Porte: {pet.size === 'small' ? 'Pequeno' : pet.size === 'medium' ? 'Médio' : 'Grande'}</div>
+                            <div>Peso: {pet.weight}kg</div>
+                          </div>
                         
                         {pet.notes && (
                           <div className="mt-3 p-3 bg-muted rounded-lg">
