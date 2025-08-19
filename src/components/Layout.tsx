@@ -18,9 +18,10 @@ import {
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePetshop } from '@/hooks/usePetshop';
 import { useAuth } from '@/hooks/useAuth';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -33,6 +34,14 @@ export default function Layout({ children }: LayoutProps) {
   const { petshop, loading } = usePetshop();
   const { signOut } = useAuth();
   const { theme, setTheme } = useTheme();
+  const isMobile = useIsMobile();
+  
+  // Fecha a sidebar automaticamente quando mudar de página em dispositivos móveis
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
 
   const menuItems = [
     { path: '/dashboard', label: 'Dashboard', icon: Home },
@@ -65,6 +74,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-card border-r transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
+        ${isMobile ? 'shadow-strong' : ''}
       `}>
         <div className="flex flex-col h-full">
           {/* Header */}
@@ -127,9 +137,9 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="flex-1 lg:ml-0">
+      <div className="flex-1 lg:ml-0 w-full">
         {/* Top bar */}
-        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b px-6 py-3">
+        <div className="sticky top-0 z-30 bg-background/80 backdrop-blur border-b px-4 sm:px-6 py-3">
           <div className="flex items-center justify-between">
             <Button
               variant="ghost"
@@ -140,7 +150,7 @@ export default function Layout({ children }: LayoutProps) {
               <Menu className="h-4 w-4" />
             </Button>
 
-            <div className="flex items-center space-x-3 ml-auto">
+            <div className="flex items-center space-x-2 sm:space-x-3 ml-auto">
               <Button 
                 variant="ghost" 
                 size="sm"
@@ -167,7 +177,7 @@ export default function Layout({ children }: LayoutProps) {
         </div>
 
         {/* Page content */}
-        <main className="flex-1">
+        <main className="flex-1 px-4 sm:px-6 py-4 sm:py-6 max-w-full overflow-x-hidden">
           {children}
         </main>
       </div>

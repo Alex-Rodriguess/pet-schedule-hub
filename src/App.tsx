@@ -8,6 +8,7 @@ import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import Dashboard from "./pages/Dashboard";
+import ReportsPage from "./pages/Reports";
 import ClientPortal from "./pages/ClientPortal";
 import CustomerRegister from "./pages/CustomerRegister";
 import CustomerRegisterPage from "./pages/CustomerRegisterPage";
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/settings" element={<Settings />} />
             <Route path="/customers" element={<Customers />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/reports" element={<ReportsPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

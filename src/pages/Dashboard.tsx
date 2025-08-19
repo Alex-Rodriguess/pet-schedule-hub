@@ -143,18 +143,18 @@ export default function Dashboard() {
 
   return (
     <Layout>
-      <div className="p-4 md:p-6">
-        <div className="max-w-7xl mx-auto space-y-6 md:space-y-8">
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
         {/* Header */}
-        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center space-y-4 lg:space-y-0">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-3 sm:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold">Dashboard</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Bem-vindo ao Pet Care Center! Aqui está um resumo do seu dia.
             </p>
           </div>
           
-          <div className="flex flex-wrap items-center gap-2 lg:gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Button variant="outline" size="sm" className="hidden md:flex">
               <Bell className="h-4 w-4 mr-2" />
               Notificações
@@ -170,7 +170,7 @@ export default function Dashboard() {
             </Button>
             <Button 
               size="sm" 
-              className="bg-gradient-primary"
+              className="bg-gradient-primary w-full sm:w-auto"
               onClick={() => navigate('/appointments')}
             >
               <Plus className="h-4 w-4 mr-2" />
@@ -188,73 +188,73 @@ export default function Dashboard() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
           <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Agendamentos Hoje</CardTitle>
-              <Calendar className="h-4 w-4 text-primary" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Agendamentos Hoje</CardTitle>
+              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.todayAppointments}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-xl sm:text-2xl font-bold">{stats.todayAppointments}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 +2 desde ontem
               </p>
             </CardContent>
           </Card>
 
           <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total de Pets</CardTitle>
-              <PawPrint className="h-4 w-4 text-secondary" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total de Pets</CardTitle>
+              <PawPrint className="h-3 w-3 sm:h-4 sm:w-4 text-secondary" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalPets}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-xl sm:text-2xl font-bold">{stats.totalPets}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 +5 este mês
               </p>
             </CardContent>
           </Card>
 
           <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Faturamento Mensal</CardTitle>
-              <DollarSign className="h-4 w-4 text-accent" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Faturamento Mensal</CardTitle>
+              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-accent" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-xl sm:text-2xl font-bold">
                 R$ {stats.monthlyRevenue.toLocaleString('pt-BR')}
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 +12% vs mês anterior
               </p>
             </CardContent>
           </Card>
 
           <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total Agendamentos</CardTitle>
-              <Users className="h-4 w-4 text-info" />
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+              <CardTitle className="text-xs sm:text-sm font-medium">Total Agendamentos</CardTitle>
+              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-info" />
             </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stats.totalAppointments}</div>
-              <p className="text-xs text-muted-foreground">
+            <CardContent className="pt-1 sm:pt-2">
+              <div className="text-xl sm:text-2xl font-bold">{stats.totalAppointments}</div>
+              <p className="text-[10px] sm:text-xs text-muted-foreground">
                 Desde o início
               </p>
             </CardContent>
           </Card>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6 md:gap-8">
+        <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Agenda Semanal */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6">
             <Card className="shadow-soft">
-              <CardHeader>
-                <CardTitle>Agenda da Semana</CardTitle>
-                <CardDescription>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl">Agenda da Semana</CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
                   Próximos agendamentos por dia
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 {weekDays.map((date, index) => {
                   const dayAppointments = getAgendaForDate(date);
                   const isToday = format(date, 'yyyy-MM-dd') === format(new Date(), 'yyyy-MM-dd');
@@ -262,39 +262,39 @@ export default function Dashboard() {
                   return (
                     <div 
                       key={index} 
-                      className={`p-4 rounded-lg border ${isToday ? 'bg-primary/5 border-primary' : 'bg-card'}`}
+                      className={`p-3 sm:p-4 rounded-lg border ${isToday ? 'bg-primary/5 border-primary' : 'bg-card'}`}
                     >
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="font-semibold flex items-center space-x-2">
+                      <div className="flex items-center justify-between mb-2 sm:mb-3">
+                        <h3 className="text-sm sm:text-base font-semibold flex items-center space-x-1 sm:space-x-2">
                           <span>
                             {format(date, 'EEE, dd/MM', { locale: ptBR })}
                           </span>
-                          {isToday && <Badge variant="secondary">Hoje</Badge>}
+                          {isToday && <Badge variant="secondary" className="text-[10px] sm:text-xs">Hoje</Badge>}
                         </h3>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-xs sm:text-sm text-muted-foreground">
                           {dayAppointments.length} agendamentos
                         </span>
                       </div>
                       
                       {dayAppointments.length > 0 ? (
-                        <div className="space-y-2">
+                        <div className="space-y-1.5 sm:space-y-2">
                           {dayAppointments.map((appointment) => {
                             const pet = pets.find(p => p.id === appointment.pet_id);
                             return (
                               <div 
                                 key={appointment.id}
-                                className="flex items-center justify-between p-3 bg-background rounded-md"
+                                className="flex items-center justify-between p-2 sm:p-3 bg-background rounded-md"
                               >
-                                <div className="flex items-center space-x-3">
+                                <div className="flex items-center space-x-2 sm:space-x-3">
                                   {getStatusIcon(appointment.status)}
                                   <div>
-                                    <div className="font-medium">{pet?.name || 'Pet'}</div>
-                                    <div className="text-sm text-muted-foreground">
+                                    <div className="text-xs sm:text-sm font-medium">{pet?.name || 'Pet'}</div>
+                                    <div className="text-[10px] sm:text-xs text-muted-foreground">
                                       {appointment.start_time} - Serviço
                                     </div>
                                   </div>
                                 </div>
-                                <Badge variant="outline">
+                                <Badge variant="outline" className="text-[10px] sm:text-xs">
                                   {getStatusLabel(appointment.status)}
                                 </Badge>
                               </div>
@@ -302,7 +302,7 @@ export default function Dashboard() {
                           })}
                         </div>
                       ) : (
-                        <p className="text-sm text-muted-foreground">
+                        <p className="text-xs sm:text-sm text-muted-foreground">
                           Nenhum agendamento
                         </p>
                       )}
@@ -314,43 +314,43 @@ export default function Dashboard() {
           </div>
 
           {/* Sidebar Stats */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             {/* Status dos Agendamentos */}
             <Card className="shadow-soft">
-              <CardHeader>
-                <CardTitle>Status dos Agendamentos</CardTitle>
+              <CardHeader className="pb-2 sm:pb-4">
+                <CardTitle className="text-lg sm:text-xl">Status dos Agendamentos</CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="space-y-3 sm:space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <CheckCircle className="h-4 w-4 text-success" />
-                    <span className="text-sm">Confirmados</span>
+                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 text-success" />
+                    <span className="text-xs sm:text-sm">Confirmados</span>
                   </div>
-                  <Badge variant="secondary">{stats.appointmentsByStatus.confirmed}</Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm">{stats.appointmentsByStatus.confirmed}</Badge>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <AlertCircle className="h-4 w-4 text-warning" />
-                    <span className="text-sm">Pendentes</span>
+                    <AlertCircle className="h-3 w-3 sm:h-4 sm:w-4 text-warning" />
+                    <span className="text-xs sm:text-sm">Pendentes</span>
                   </div>
-                  <Badge variant="secondary">{stats.appointmentsByStatus.pending}</Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm">{stats.appointmentsByStatus.pending}</Badge>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Clock className="h-4 w-4 text-info" />
-                    <span className="text-sm">Concluídos</span>
+                    <Clock className="h-3 w-3 sm:h-4 sm:w-4 text-info" />
+                    <span className="text-xs sm:text-sm">Concluídos</span>
                   </div>
-                  <Badge variant="secondary">{stats.appointmentsByStatus.completed}</Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm">{stats.appointmentsByStatus.completed}</Badge>
                 </div>
                 
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <XCircle className="h-4 w-4 text-destructive" />
-                    <span className="text-sm">Cancelados</span>
+                    <XCircle className="h-3 w-3 sm:h-4 sm:w-4 text-destructive" />
+                    <span className="text-xs sm:text-sm">Cancelados</span>
                   </div>
-                  <Badge variant="secondary">{stats.appointmentsByStatus.cancelled}</Badge>
+                  <Badge variant="secondary" className="text-xs sm:text-sm">{stats.appointmentsByStatus.cancelled}</Badge>
                 </div>
               </CardContent>
             </Card>
@@ -394,7 +394,12 @@ export default function Dashboard() {
                   <PawPrint className="h-4 w-4 mr-2" />
                   Cadastrar Pet
                 </Button>
-                <Button variant="outline" size="sm" className="w-full justify-start">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full justify-start"
+                  onClick={() => navigate('/reports')}
+                >
                   <BarChart3 className="h-4 w-4 mr-2" />
                   Ver Relatórios
                 </Button>

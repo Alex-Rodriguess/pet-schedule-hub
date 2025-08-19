@@ -85,15 +85,15 @@ export default function LandingPage() {
       <header className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <PawPrint className="h-8 w-8 text-primary" />
-            <span className="text-2xl font-bold text-primary">Pet Schedule Hub</span>
+            <PawPrint className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+            <span className="text-xl sm:text-2xl font-bold text-primary">Pet Schedule Hub</span>
           </div>
           
-          <div className="flex items-center space-x-4">
-            <Button variant="ghost" onClick={() => navigate('/login')}>
+          <div className="flex items-center space-x-2 sm:space-x-4">
+            <Button variant="ghost" size="sm" className="sm:text-base sm:px-4" onClick={() => navigate('/login')}>
               Entrar
             </Button>
-            <Button onClick={() => navigate('/register')}>
+            <Button size="sm" className="sm:text-base sm:px-4" onClick={() => navigate('/register')}>
               Começar Grátis
             </Button>
           </div>
@@ -101,28 +101,28 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 bg-gradient-hero text-primary-foreground overflow-hidden">
-        <div className="container mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div className="space-y-8">
-            <Badge className="bg-white/20 text-white border-white/30">
+      <section className="relative py-12 sm:py-16 md:py-20 px-4 bg-gradient-hero text-primary-foreground overflow-hidden">
+        <div className="container mx-auto grid lg:grid-cols-2 gap-8 md:gap-12 items-center">
+          <div className="space-y-6 md:space-y-8 order-2 lg:order-1">
+            <Badge className="bg-white/20 text-white border-white/30 text-xs sm:text-sm">
               Mais de 1.000 petshops confiam em nós
             </Badge>
             
-            <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight">
               Gerencie seu
               <span className="text-accent"> petshop </span>
               com inteligência
             </h1>
             
-            <p className="text-xl opacity-90 leading-relaxed">
+            <p className="text-base sm:text-lg md:text-xl opacity-90 leading-relaxed">
               Sistema completo para agendamentos, gestão de clientes e pets.
               Aumente sua produtividade e a satisfação dos seus clientes.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <Button 
                 size="lg" 
-                className="bg-white text-primary hover:bg-white/90 shadow-medium"
+                className="bg-white text-primary hover:bg-white/90 shadow-medium w-full sm:w-auto"
                 onClick={() => navigate('/register')}
               >
                 Começar Gratuitamente
@@ -130,13 +130,13 @@ export default function LandingPage() {
               <Button 
                 size="lg" 
                 variant="outline" 
-                className="border-white text-white hover:bg-white/10"
+                className="border-white text-white hover:bg-white/10 w-full sm:w-auto"
               >
                 Ver Demonstração
               </Button>
             </div>
             
-            <div className="flex items-center space-x-8 text-sm opacity-80">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-8 space-y-2 sm:space-y-0 text-xs sm:text-sm opacity-80">
               <div className="flex items-center space-x-2">
                 <Clock className="h-4 w-4" />
                 <span>Setup em 5 minutos</span>
@@ -148,20 +148,20 @@ export default function LandingPage() {
             </div>
           </div>
           
-          <div className="relative">
+          <div className="relative order-1 lg:order-2 mb-8 lg:mb-0">
             <img 
               src={heroImage} 
               alt="Pet sendo cuidado em petshop moderno"
               className="rounded-2xl shadow-strong w-full"
             />
-            <div className="absolute -bottom-6 -left-6 bg-white rounded-xl p-4 shadow-medium">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-primary rounded-full flex items-center justify-center">
-                  <Calendar className="h-6 w-6 text-white" />
+            <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-medium">
+              <div className="flex items-center space-x-2 sm:space-x-3">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-primary rounded-full flex items-center justify-center">
+                  <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
                 </div>
                 <div>
-                  <div className="font-semibold text-foreground">+150 agendamentos</div>
-                  <div className="text-sm text-muted-foreground">este mês</div>
+                  <div className="font-semibold text-foreground text-sm sm:text-base">+150 agendamentos</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">este mês</div>
                 </div>
               </div>
             </div>
@@ -170,24 +170,24 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-16 md:py-20 px-4">
         <div className="container mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-4xl font-bold">Tudo que você precisa para crescer</h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <div className="text-center space-y-3 sm:space-y-4 mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Tudo que você precisa para crescer</h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Ferramentas profissionais para modernizar seu petshop e encantar seus clientes
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
             {features.map((feature, index) => (
               <Card key={index} className="border-0 shadow-soft hover:shadow-medium transition-all scale-hover">
-                <CardContent className="p-8 text-center space-y-4">
-                  <div className="w-16 h-16 bg-gradient-primary rounded-2xl flex items-center justify-center mx-auto">
-                    <feature.icon className="h-8 w-8 text-white" />
+                <CardContent className="p-4 sm:p-6 md:p-8 text-center space-y-3 sm:space-y-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-primary rounded-xl sm:rounded-2xl flex items-center justify-center mx-auto">
+                    <feature.icon className="h-6 w-6 sm:h-8 sm:w-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold">{feature.title}</h3>
-                  <p className="text-muted-foreground">{feature.description}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold">{feature.title}</h3>
+                  <p className="text-sm sm:text-base text-muted-foreground">{feature.description}</p>
                 </CardContent>
               </Card>
             ))}
@@ -196,16 +196,16 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 px-4 bg-muted/30">
+      <section className="py-12 sm:py-16 md:py-20 px-4 bg-muted/30">
         <div className="container mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-4xl font-bold">O que nossos clientes dizem</h2>
-            <p className="text-xl text-muted-foreground">
+          <div className="text-center space-y-3 sm:space-y-4 mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">O que nossos clientes dizem</h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Histórias reais de petshops que transformaram seus negócios
             </p>
           </div>
           
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 md:gap-8">
             {testimonials.map((testimonial, index) => (
               <Card key={index} className="border-0 shadow-soft">
                 <CardContent className="p-8 space-y-4">
@@ -227,16 +227,16 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Section */}
-      <section className="py-20 px-4">
+      <section className="py-12 sm:py-16 md:py-20 px-4">
         <div className="container mx-auto">
-          <div className="text-center space-y-4 mb-16">
-            <h2 className="text-4xl font-bold">Planos que crescem com você</h2>
-            <p className="text-xl text-muted-foreground">
+          <div className="text-center space-y-3 sm:space-y-4 mb-10 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">Planos que crescem com você</h2>
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
               Escolha o plano ideal para o seu petshop. Comece grátis!
             </p>
           </div>
           
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8 max-w-6xl mx-auto">
             {saasPlans.map((plan) => (
               <PricingCard 
                 key={plan.id} 
@@ -255,18 +255,18 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4 bg-gradient-hero text-primary-foreground">
-        <div className="container mx-auto text-center space-y-8">
-          <h2 className="text-4xl font-bold">
+      <section className="py-12 sm:py-16 md:py-20 px-4 bg-gradient-hero text-primary-foreground">
+        <div className="container mx-auto text-center space-y-6 sm:space-y-8">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
             Pronto para revolucionar seu petshop?
           </h2>
-          <p className="text-xl opacity-90 max-w-2xl mx-auto">
+          <p className="text-base sm:text-lg md:text-xl opacity-90 max-w-2xl mx-auto">
             Junte-se a milhares de petshops que já modernizaram sua gestão. 
             Comece hoje mesmo, é grátis!
           </p>
           <Button 
             size="lg" 
-            className="bg-white text-primary hover:bg-white/90 shadow-medium"
+            className="bg-white text-primary hover:bg-white/90 shadow-medium w-full sm:w-auto"
             onClick={() => navigate('/register')}
           >
             Começar Agora - É Grátis!
@@ -275,22 +275,22 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 px-4 border-t border-border">
+      <footer className="py-8 sm:py-12 px-4 border-t border-border">
         <div className="container mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             <div className="flex items-center space-x-2">
-              <PawPrint className="h-6 w-6 text-primary" />
-              <span className="text-lg font-semibold">Pet Schedule Hub</span>
+              <PawPrint className="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+              <span className="text-base sm:text-lg font-semibold">Pet Schedule Hub</span>
             </div>
             
-            <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+            <div className="flex items-center space-x-4 sm:space-x-6 text-xs sm:text-sm text-muted-foreground">
               <a href="#" className="hover:text-primary">Termos de Uso</a>
               <a href="#" className="hover:text-primary">Privacidade</a>
               <a href="#" className="hover:text-primary">Suporte</a>
             </div>
           </div>
           
-          <div className="mt-8 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+          <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-border text-center text-xs sm:text-sm text-muted-foreground">
             © 2024 Pet Schedule Hub. Todos os direitos reservados.
           </div>
         </div>
