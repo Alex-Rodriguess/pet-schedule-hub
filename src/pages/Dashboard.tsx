@@ -40,13 +40,36 @@ export default function Dashboard() {
       cancelled: 0
     }
   });
-  const [appointments, setAppointments] = useState<any[]>([]);
-  const [pets, setPets] = useState<any[]>([]);
+  type Appointment = {
+    id: string;
+    appointment_date: string;
+    start_time: string;
+    price?: number;
+    status: 'pending' | 'confirmed' | 'completed' | 'cancelled' | string;
+    pet_id: string;
+    // Adicione outros campos conforme necessário
+  };
+  type Pet = {
+    id: string;
+    name: string;
+    customer_id: string;
+    // Adicione outros campos conforme necessário
+  };
+  type StatusCounts = {
+    pending: number;
+    confirmed: number;
+    completed: number;
+    cancelled: number;
+    [key: string]: number;
+  };
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
     if (petshop?.id) {
       loadData();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [petshop]);
 
   const loadData = async () => {
@@ -91,10 +114,10 @@ export default function Dashboard() {
 
       const monthlyRevenue = monthlyAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
 
-      const statusCounts = appointmentsData?.reduce((acc, apt) => {
+      const statusCounts: StatusCounts = appointmentsData?.reduce((acc, apt) => {
         acc[apt.status] = (acc[apt.status] || 0) + 1;
         return acc;
-      }, {} as any) || {};
+      }, { pending: 0, confirmed: 0, completed: 0, cancelled: 0 }) || { pending: 0, confirmed: 0, completed: 0, cancelled: 0 };
 
       setStats({
         totalAppointments: appointmentsData?.length || 0,
