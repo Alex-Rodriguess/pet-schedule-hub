@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { 
   Calendar, 
@@ -36,6 +36,7 @@ export default function ClientPortal() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showPetDialog, setShowPetDialog] = useState(false);
+  const [petLoading, setPetLoading] = useState(false);
   const [showAppointmentDialog, setShowAppointmentDialog] = useState(false);
   const { user } = useAuth();
   const { petshop } = usePetshop();
@@ -60,11 +61,93 @@ export default function ClientPortal() {
     notes: ''
   });
 
-  useEffect(() => {
-    loadData();
+  // ...existing code...
+
+  const loadPets = React.useCallback(async () => {
+    if (!user) return;
+    try {
+      // Busca o cliente pelo email e petshop_id (igual ao handleSavePet)
+      let customerData;
+      let customerError;
+      ({ data: customerData, error: customerError } = await supabase
+        .from('customers')
+        .select('*')
+        .eq('email', user.email)
+        .eq('petshop_id', petshop?.id)
+        .single());
+
+      // Se não encontrar, tenta novamente após 500ms
+      if (!customerData && !customerError) {
+        await new Promise(res => setTimeout(res, 500));
+        ({ data: customerData, error: customerError } = await supabase
+          .from('customers')
+          .select('*')
+          .eq('email', user.email)
+          .eq('petshop_id', petshop?.id)
+          .single());
+      }
+
+      if (customerError || !customerData) {
+        setPets([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('pets')
+        .select(`*, customer:customers(*)`)
+        .eq('customer_id', customerData.id);
+
+      if (error) throw error;
+      setPets(data || []);
+    } catch (error) {
+      console.error('Erro ao carregar pets:', error);
+    }
+  }, [user, petshop]);
+
+  const loadAppointments = React.useCallback(async () => {
+    if (!user) return;
+    try {
+      // Busca o cliente pelo email e petshop_id
+      const { data: customer, error: customerError } = await supabase
+        .from('customers')
+        .select('id')
+        .eq('email', user.email)
+        .eq('petshop_id', petshop?.id)
+        .single();
+
+      if (customerError || !customer) {
+        setAppointments([]);
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('appointments')
+        .select(`*, pet:pets(*), service:services(*), customer:customers(*)`)
+        .eq('customer_id', customer.id)
+        .order('appointment_date', { ascending: false });
+
+      if (error) throw error;
+      setAppointments(data || []);
+    } catch (error) {
+      console.error('Error loading appointments:', error);
+    }
+  }, [user, petshop]);
+
+  const loadServices = React.useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('services')
+        .select('*')
+        .eq('active', true);
+
+      if (error) throw error;
+      setServices(data || []);
+    } catch (error) {
+      console.error('Error loading services:', error);
+    }
   }, []);
 
-  const loadData = async () => {
+  const loadData = React.useCallback(async () => {
     try {
       setLoading(true);
       await Promise.all([
@@ -77,70 +160,24 @@ export default function ClientPortal() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [loadPets, loadAppointments, loadServices]);
 
-  const loadPets = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('pets')
-        .select(`
-          *,
-          customer:customers(*)
-        `)
-        .eq('customers.email', user.email);
-
-      if (error) throw error;
-      setPets(data || []);
-    } catch (error) {
-      console.error('Error loading pets:', error);
-    }
-  };
-
-  const loadAppointments = async () => {
-    if (!user) return;
-    
-    try {
-      const { data, error } = await supabase
-        .from('appointments')
-        .select(`
-          *,
-          pet:pets(*),
-          service:services(*),
-          customer:customers(*)
-        `)
-        .eq('customers.email', user.email)
-        .order('appointment_date', { ascending: false });
-
-      if (error) throw error;
-      setAppointments(data || []);
-    } catch (error) {
-      console.error('Error loading appointments:', error);
-    }
-  };
-
-  const loadServices = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('services')
-        .select('*')
-        .eq('active', true);
-
-      if (error) throw error;
-      setServices(data || []);
-    } catch (error) {
-      console.error('Error loading services:', error);
-    }
-  };
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
 
   const handleSavePet = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!user || !petshop?.id) return;
-
+    if (!user || !petshop?.id) {
+      setPetLoading(false);
+      return;
+    }
+    setPetLoading(true);
+    console.log('handleSavePet chamado');
     try {
-      // First, get or create customer
-      let { data: customer, error: customerError } = await supabase
+      // Primeiro, busca ou cria o cliente
+      let customer;
+      const { data: customerData, error: customerError } = await supabase
         .from('customers')
         .select('*')
         .eq('email', user.email)
@@ -151,7 +188,7 @@ export default function ClientPortal() {
         throw customerError;
       }
 
-      if (!customer) {
+      if (!customerData) {
         const { data: newCustomer, error: createError } = await supabase
           .from('customers')
           .insert({
@@ -165,6 +202,8 @@ export default function ClientPortal() {
 
         if (createError) throw createError;
         customer = newCustomer;
+      } else {
+        customer = customerData;
       }
 
       const { error } = await supabase
@@ -190,19 +229,21 @@ export default function ClientPortal() {
         notes: ''
       });
       setShowPetDialog(false);
-      loadPets();
-      
+      await loadPets();
       toast({
         title: "Pet cadastrado",
         description: "Pet cadastrado com sucesso!",
       });
     } catch (error) {
-      console.error('Error saving pet:', error);
+      console.error('Erro ao cadastrar pet:', error);
       toast({
         title: "Erro",
         description: "Erro ao cadastrar pet. Tente novamente.",
         variant: "destructive"
       });
+    } finally {
+      setPetLoading(false);
+      console.log('handleSavePet finalizado');
     }
   };
 
@@ -278,10 +319,10 @@ export default function ClientPortal() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'success';
-      case 'pending': return 'warning';
+      case 'confirmed': return 'default';
+      case 'pending': return 'secondary';
       case 'cancelled': return 'destructive';
-      case 'completed': return 'success';
+      case 'completed': return 'default';
       default: return 'secondary';
     }
   };
@@ -471,9 +512,38 @@ export default function ClientPortal() {
                             </div>
                             <div className="flex items-center space-x-2 mt-2">
                               {getStatusIcon(appointment.status)}
-                              <Badge variant={getStatusColor(appointment.status) as any}>
+                              <Badge variant={getStatusColor(appointment.status)}>
                                 {getStatusLabel(appointment.status)}
                               </Badge>
+                              <div className="ml-2 w-32">
+                                <Select
+                                  value={appointment.status}
+                                  onValueChange={async (newStatus) => {
+                                    if (newStatus !== appointment.status) {
+                                      const { error } = await supabase
+                                        .from('appointments')
+                                        .update({ status: newStatus })
+                                        .eq('id', appointment.id);
+                                      if (!error) {
+                                        toast({ title: 'Status atualizado', description: `O status foi alterado para ${getStatusLabel(newStatus)}.` });
+                                        loadAppointments();
+                                      } else {
+                                        toast({ title: 'Erro', description: 'Não foi possível alterar o status.', variant: 'destructive' });
+                                      }
+                                    }
+                                  }}
+                                >
+                                  <SelectTrigger>
+                                    <SelectValue placeholder="Alterar status" />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="pending">Pendente</SelectItem>
+                                    <SelectItem value="confirmed">Confirmado</SelectItem>
+                                    <SelectItem value="completed">Concluído</SelectItem>
+                                    <SelectItem value="cancelled">Cancelado</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </div>
                             </div>
                           </div>
                         </div>
@@ -490,10 +560,26 @@ export default function ClientPortal() {
                               </Button>
                             )}
                             {appointment.status !== 'completed' && appointment.status !== 'cancelled' && (
-                              <Button variant="outline" size="sm">
-                                <Edit className="h-4 w-4 mr-1" />
-                                Reagendar
-                              </Button>
+                              <>
+                                <Button variant="outline" size="sm">
+                                  <Edit className="h-4 w-4 mr-1" />
+                                  Reagendar
+                                </Button>
+                                <Button variant="ghost" size="icon" title="Marcar como concluído" onClick={async () => {
+                                  const { error } = await supabase
+                                    .from('appointments')
+                                    .update({ status: 'completed' })
+                                    .eq('id', appointment.id);
+                                  if (!error) {
+                                    toast({ title: 'Agendamento concluído', description: 'O agendamento foi marcado como concluído.' });
+                                    loadAppointments();
+                                  } else {
+                                    toast({ title: 'Erro', description: 'Não foi possível marcar como concluído.', variant: 'destructive' });
+                                  }
+                                }}>
+                                  <CheckCircle className="h-5 w-5 text-success" />
+                                </Button>
+                              </>
                             )}
                           </div>
                         </div>
@@ -595,12 +681,20 @@ export default function ClientPortal() {
                           placeholder="Observações importantes sobre o pet..."
                         />
                       </div>
+                      {/* Formulário de cadastro de pet renderizado */}
                       <div className="flex justify-end space-x-2">
-                        <Button type="button" variant="outline" onClick={() => setShowPetDialog(false)}>
+                        <Button type="button" variant="outline" onClick={() => setShowPetDialog(false)} disabled={petLoading}>
                           Cancelar
                         </Button>
-                        <Button type="submit">
-                          Cadastrar
+                        <Button
+                          type="submit"
+                          disabled={petLoading}
+                          onClick={e => {
+                            e.preventDefault();
+                            handleSavePet(e);
+                          }}
+                        >
+                          {petLoading ? 'Cadastrando...' : 'Cadastrar'}
                         </Button>
                       </div>
                     </form>

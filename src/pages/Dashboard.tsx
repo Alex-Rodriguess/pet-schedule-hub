@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Button } from '@/components/ui/button';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerClose } from '@/components/ui/drawer';
 import { Badge } from '@/components/ui/badge';
 import { 
   Calendar, 
@@ -24,6 +26,30 @@ import { supabase } from '@/integrations/supabase/client';
 import { usePetshop } from '@/hooks/usePetshop';
 
 export default function Dashboard() {
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [notifications, setNotifications] = useState([
+    {
+      id: 1,
+      type: 'appointment',
+      title: 'Novo agendamento confirmado',
+      description: 'Cliente João agendou Banho e Tosa para o pet Rex.',
+      date: 'Hoje, 09:30',
+    },
+    {
+      id: 2,
+      type: 'pet',
+      title: 'Novo pet cadastrado',
+      description: 'Pet Luna foi cadastrado por Maria.',
+      date: 'Ontem, 17:10',
+    },
+    {
+      id: 3,
+      type: 'sale',
+      title: 'Venda realizada no PDV',
+      description: 'Venda de R$ 120,00 concluída.',
+      date: 'Ontem, 15:45',
+    },
+  ]);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const navigate = useNavigate();
   const { petshop } = usePetshop();
@@ -82,6 +108,16 @@ export default function Dashboard() {
         .select('*')
         .eq('petshop_id', petshop.id);
 
+      // Carregar vendas do PDV
+      const today = new Date();
+      const currentMonth = format(today, 'yyyy-MM');
+      const { data: salesData } = await supabase
+        .from('sales')
+        .select('final_amount, status, created_at')
+        .eq('petshop_id', petshop.id)
+        .gte('created_at', `${currentMonth}-01`)
+        .lte('created_at', `${currentMonth}-31`);
+
       // Carregar pets
       const { data: customersData } = await supabase
         .from('customers')
@@ -100,9 +136,7 @@ export default function Dashboard() {
       setAppointments(appointmentsData || []);
 
       // Calcular estatísticas
-      const today = new Date();
       const todayStr = format(today, 'yyyy-MM-dd');
-      const currentMonth = format(today, 'yyyy-MM');
 
       const todayAppointments = appointmentsData?.filter(apt => 
         format(new Date(apt.appointment_date), 'yyyy-MM-dd') === todayStr
@@ -112,7 +146,12 @@ export default function Dashboard() {
         format(new Date(apt.appointment_date), 'yyyy-MM') === currentMonth
       ) || [];
 
-      const monthlyRevenue = monthlyAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+      // Faturamento dos agendamentos
+      const monthlyRevenueAppointments = monthlyAppointments.reduce((sum, apt) => sum + (apt.price || 0), 0);
+      // Faturamento das vendas do PDV
+      const monthlyRevenueSales = (salesData || []).filter(s => s.status === 'completed').reduce((sum, s) => sum + (s.final_amount || 0), 0);
+      // Faturamento total
+      const monthlyRevenue = monthlyRevenueAppointments + monthlyRevenueSales;
 
       const statusCounts: StatusCounts = appointmentsData?.reduce((acc, apt) => {
         acc[apt.status] = (acc[apt.status] || 0) + 1;
@@ -166,6 +205,7 @@ export default function Dashboard() {
 
   return (
     <Layout>
+      <TooltipProvider>
       <div className="p-3 sm:p-4 md:p-6">
         <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6 md:space-y-8">
         {/* Header */}
@@ -178,10 +218,27 @@ export default function Dashboard() {
           </div>
           
           <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-            <Button variant="outline" size="sm" className="hidden md:flex">
+            {/* Botão de notificações para desktop */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="hidden md:flex"
+              onClick={() => setDrawerOpen(true)}
+            >
               <Bell className="h-4 w-4 mr-2" />
               Notificações
-              <Badge className="ml-2 bg-destructive">3</Badge>
+              <Badge className="ml-2 bg-destructive">{notifications.length}</Badge>
+            </Button>
+            {/* Botão de notificações para mobile */}
+            <Button 
+              variant="outline" 
+              size="sm" 
+              className="md:hidden flex"
+              onClick={() => setDrawerOpen(true)}
+            >
+              <Bell className="h-4 w-4 mr-2" />
+              <span className="hidden sm:inline">Notificações</span>
+              <Badge className="ml-2 bg-destructive">{notifications.length}</Badge>
             </Button>
             <Button 
               variant="outline" 
@@ -212,59 +269,79 @@ export default function Dashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
-          <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Agendamentos Hoje</CardTitle>
-              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
-            </CardHeader>
-            <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl font-bold">{stats.todayAppointments}</div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">
-                +2 desde ontem
-              </p>
-            </CardContent>
-          </Card>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card className="shadow-soft cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+                  <CardTitle className="text-xs sm:text-sm font-medium">Agendamentos Hoje</CardTitle>
+                  <Calendar className="h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                </CardHeader>
+                <CardContent className="pt-1 sm:pt-2">
+                  <div className="text-xl sm:text-2xl font-bold">{stats.todayAppointments}</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    +2 desde ontem
+                  </p>
+                </CardContent>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent>Quantidade de agendamentos realizados para hoje.</TooltipContent>
+          </Tooltip>
 
-          <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Total de Pets</CardTitle>
-              <PawPrint className="h-3 w-3 sm:h-4 sm:w-4 text-secondary" />
-            </CardHeader>
-            <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl font-bold">{stats.totalPets}</div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">
-                +5 este mês
-              </p>
-            </CardContent>
-          </Card>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card className="shadow-soft cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+                  <CardTitle className="text-xs sm:text-sm font-medium">Total de Pets</CardTitle>
+                  <PawPrint className="h-3 w-3 sm:h-4 sm:w-4 text-secondary" />
+                </CardHeader>
+                <CardContent className="pt-1 sm:pt-2">
+                  <div className="text-xl sm:text-2xl font-bold">{stats.totalPets}</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    +5 este mês
+                  </p>
+                </CardContent>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent>Total de pets cadastrados no sistema.</TooltipContent>
+          </Tooltip>
 
-          <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Faturamento Mensal</CardTitle>
-              <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-accent" />
-            </CardHeader>
-            <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl font-bold">
-                R$ {stats.monthlyRevenue.toLocaleString('pt-BR')}
-              </div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">
-                +12% vs mês anterior
-              </p>
-            </CardContent>
-          </Card>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card className="shadow-soft cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+                  <CardTitle className="text-xs sm:text-sm font-medium">Faturamento Mensal</CardTitle>
+                  <DollarSign className="h-3 w-3 sm:h-4 sm:w-4 text-accent" />
+                </CardHeader>
+                <CardContent className="pt-1 sm:pt-2">
+                  <div className="text-xl sm:text-2xl font-bold">
+                    R$ {stats.monthlyRevenue.toLocaleString('pt-BR')}
+                  </div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    +12% vs mês anterior
+                  </p>
+                </CardContent>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent>Faturamento total do mês, incluindo agendamentos e vendas do PDV.</TooltipContent>
+          </Tooltip>
 
-          <Card className="shadow-soft">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
-              <CardTitle className="text-xs sm:text-sm font-medium">Total Agendamentos</CardTitle>
-              <Users className="h-3 w-3 sm:h-4 sm:w-4 text-info" />
-            </CardHeader>
-            <CardContent className="pt-1 sm:pt-2">
-              <div className="text-xl sm:text-2xl font-bold">{stats.totalAppointments}</div>
-              <p className="text-[10px] sm:text-xs text-muted-foreground">
-                Desde o início
-              </p>
-            </CardContent>
-          </Card>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Card className="shadow-soft cursor-pointer">
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 sm:pb-2">
+                  <CardTitle className="text-xs sm:text-sm font-medium">Total Agendamentos</CardTitle>
+                  <Users className="h-3 w-3 sm:h-4 sm:w-4 text-info" />
+                </CardHeader>
+                <CardContent className="pt-1 sm:pt-2">
+                  <div className="text-xl sm:text-2xl font-bold">{stats.totalAppointments}</div>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground">
+                    Desde o início
+                  </p>
+                </CardContent>
+              </Card>
+            </TooltipTrigger>
+            <TooltipContent>Total de agendamentos realizados desde o início.</TooltipContent>
+          </Tooltip>
         </div>
 
         <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
@@ -441,6 +518,68 @@ export default function Dashboard() {
         </div>
         </div>
       </div>
+      {/* Drawer de Notificações */}
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <DrawerContent className="max-w-md mx-auto rounded-xl shadow-lg border bg-background">
+          <DrawerHeader className="sticky top-0 bg-background z-10 border-b flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-2">
+              <Bell className="h-5 w-5 text-primary" />
+              <DrawerTitle className="text-lg font-bold">Notificações</DrawerTitle>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setNotifications([])} disabled={notifications.length === 0}>
+                Limpar tudo
+              </Button>
+              <DrawerClose asChild>
+                <Button variant="ghost" size="icon" onClick={() => setDrawerOpen(false)}>
+                  <span className="sr-only">Fechar</span>
+                  <XCircle className="h-5 w-5 text-muted-foreground" />
+                </Button>
+              </DrawerClose>
+            </div>
+          </DrawerHeader>
+          <div className="p-4 max-h-[60vh] overflow-y-auto space-y-4 scrollbar-thin scrollbar-thumb-primary/30 scrollbar-track-transparent">
+            {notifications.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-40 text-muted-foreground">
+                <Bell className="h-8 w-8 mb-2" />
+                <p className="text-sm">Nenhuma notificação recente.</p>
+              </div>
+            ) : (
+              notifications.map((n) => {
+                let icon, color;
+                switch (n.type) {
+                  case 'appointment':
+                    icon = <Calendar className="h-5 w-5 text-primary" />;
+                    color = 'border-primary';
+                    break;
+                  case 'pet':
+                    icon = <PawPrint className="h-5 w-5 text-secondary" />;
+                    color = 'border-secondary';
+                    break;
+                  case 'sale':
+                    icon = <DollarSign className="h-5 w-5 text-accent" />;
+                    color = 'border-accent';
+                    break;
+                  default:
+                    icon = <AlertCircle className="h-5 w-5 text-muted-foreground" />;
+                    color = 'border-muted';
+                }
+                return (
+                  <div key={n.id} className={`flex items-start gap-3 border-l-4 ${color} bg-background rounded-lg p-3 shadow-sm transition-all hover:bg-primary/5`}>
+                    {icon}
+                    <div className="flex-1">
+                      <div className="font-semibold text-primary mb-1">{n.title}</div>
+                      <div className="text-sm text-muted-foreground mb-1">{n.description}</div>
+                      <div className="text-xs text-muted-foreground">{n.date}</div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+        </DrawerContent>
+      </Drawer>
+      </TooltipProvider>
     </Layout>
   );
 }
